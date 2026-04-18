@@ -339,97 +339,104 @@ export default function App() {
               <motion.div 
                 key="report"
                 initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }}
-                className="p-6 md:p-12 space-y-8 md:space-y-10 max-w-[640px] mx-auto pb-24"
+                className="p-4 md:p-8 space-y-6 md:space-y-8 max-w-[640px] mx-auto pb-24"
               >
                 {/* Mobile Back Button */}
                 <button 
                   onClick={() => setResult(null)}
-                  className="md:hidden text-[10px] font-mono text-vl-muted flex items-center gap-2 mb-4 bg-vl-surface border border-vl-border px-3 py-1 rounded-full"
+                  className="md:hidden text-[10px] font-mono text-vl-muted flex items-center gap-2 mb-2 bg-vl-surface border border-vl-border px-3 py-1 rounded-full"
                 >
-                  ← 改動參數 (Back to Input)
+                  ← 改動參數 (Back)
                 </button>
 
-                {/* Certificate Block */}
-                <div className="border-[3px] border-vl-border p-6 md:p-8 space-y-8 relative overflow-hidden bg-vl-surface/30">
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-vl-red/5 -mr-16 -mt-16 rounded-full blur-[40px]" />
+                {/* Vertical Report Structure */}
+                <div className="border-[1px] border-vl-border/60 p-5 md:p-8 space-y-8 bg-vl-surface/10 relative">
+                  <div className="absolute top-0 right-0 p-2 font-mono text-[7px] text-vl-muted/30 border-b border-l border-vl-border/30">
+                    ID: VLEI-{date.replace(/-/g, '')}-{(Math.random()*100).toFixed(0).padStart(3, '0')}
+                  </div>
                   
-                  {/* Certificate Header */}
-                  <div className="flex justify-between items-start border-b border-vl-border pb-6 relative z-10">
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <div className="w-2 h-2 rounded-full bg-vl-red animate-pulse" />
-                        <span className="text-[9px] font-mono font-bold tracking-[0.2em] text-vl-red uppercase">Official Certificate</span>
-                      </div>
-                      <h2 className="text-2xl font-serif italic text-vl-text tracking-tighter">🕯️ 時空能量鑑定報告</h2>
-                    </div>
-                    <div className="text-right font-mono text-[9px] text-vl-muted space-y-1">
-                      <p>VLEI-{date.replace(/-/g, '')}-{(Math.random()*1000).toFixed(0).padStart(3, '0')}</p>
-                      <p>LEVEL: CLASSIFIED</p>
-                    </div>
+                  <div className="text-center border-b border-vl-border pb-6">
+                    <h2 className="text-xl md:text-2xl font-serif italic text-vl-text tracking-tighter mb-1">🕯️ 時空能量鑑定報告</h2>
+                    <p className="text-[9px] font-mono text-vl-gold/60 uppercase tracking-[0.3em]">Official Certificate V2.6.5</p>
                   </div>
 
-                  {/* Nodes */}
-                  <div className="grid grid-cols-2 gap-6 relative z-10">
-                    <div className="space-y-1">
-                      <p className="text-[8px] font-mono text-vl-gold uppercase tracking-widest">事發時空 / Node</p>
-                      <p className="text-[14px] font-serif leading-tight">{lunarInfo.lunarDate}<br/>{lunarInfo.ganZhiDay} ({lunarInfo.wuXingDay}屬)</p>
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2 border-l-2 border-vl-gold pl-3">
+                       <h3 className="text-[11px] font-mono text-vl-gold uppercase tracking-[0.2em] font-bold">【時空定格 / SPACETIME NODE】</h3>
                     </div>
-                    <div className="space-y-1">
-                      <p className="text-[8px] font-mono text-vl-gold uppercase tracking-widest">行為氣場 / Context</p>
-                      <p className="text-[14px] font-serif leading-tight">{selectedScenario}<br/>映射方位：{direction}</p>
+                    <div className="grid grid-cols-1 gap-4 pl-4 text-[13px] font-serif italic">
+                       <div className="flex justify-between border-b border-vl-border/20 pb-1">
+                          <span className="text-vl-muted">事發日課</span>
+                          <span>{lunarInfo.lunarDate} | {lunarInfo.ganZhiDay} | {lunarInfo.dayType}</span>
+                       </div>
+                       <div className="flex justify-between border-b border-vl-border/20 pb-1">
+                          <span className="text-vl-muted">先天能量</span>
+                          <span>生肖屬 [{userZodiac}]</span>
+                       </div>
+                       <div className="space-y-1">
+                          <span className="text-vl-muted block text-[11px]">相位關係</span>
+                          <span className="text-vl-text leading-tight">{result.phaseRelationship}</span>
+                       </div>
                     </div>
                   </div>
 
-                  {/* TARGET IDENTITY */}
-                  <div className="bg-vl-bg/80 border border-vl-border p-6 space-y-5 relative z-10">
-                     <div className="space-y-2">
-                        <div className="text-[9px] font-mono text-vl-red font-bold uppercase tracking-[0.4em] mb-1 flex items-center gap-2">
-                          <Skull className="w-3 h-3" /> 鑑定主體 / Target Identity
-                        </div>
-                        <h3 className="text-3xl font-serif italic text-vl-red tracking-tight leading-none">{result.targetObject}</h3>
-                        <p className="text-[11px] font-serif text-vl-text/70 italic border-l border-vl-border pl-3 mt-2">{result.targetTranslation}</p>
-                     </div>
-
-                     <div className="space-y-2 border-t border-vl-border/30 pt-4">
-                        <div className="text-[9px] font-mono text-vl-gold uppercase tracking-[0.2em]">深度解析 / Deep Analysis</div>
-                        <p className="text-[15px] font-serif leading-relaxed italic text-vl-text/90">
-                           {result.incidentAnalysis}
-                        </p>
-                     </div>
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2 border-l-2 border-vl-red pl-3">
+                       <h3 className="text-[11px] font-mono text-vl-red uppercase tracking-[0.2em] font-bold">【鑑定主體 / TARGET IDENTITY】</h3>
+                    </div>
+                    <div className="pl-4 space-y-2">
+                       <div className="text-3xl font-serif italic text-vl-red tracking-tight">{result.targetObject}</div>
+                       <p className="text-[12px] font-serif text-vl-text/70 italic bg-vl-red/5 p-2 border-l border-vl-red/30">
+                          {result.targetTranslation}
+                       </p>
+                    </div>
                   </div>
 
-                  {/* PROTOCOLS */}
-                  <div className="space-y-6 relative z-10">
-                     <div className="text-[10px] font-mono text-vl-gold uppercase tracking-[0.3em] font-bold border-b border-vl-border pb-1">校準協議 / Protocols</div>
-                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="space-y-3">
-                           <p className="text-[9px] font-mono text-vl-muted uppercase flex items-center gap-2"><Zap className="w-3 h-3" /> 核心資糧</p>
-                           <div className="flex flex-wrap gap-2">
-                              {result.materials.map(m => (
-                                <span key={m} className="px-2 py-1 border border-vl-border text-[10px] font-serif italic">{m}</span>
-                              ))}
-                           </div>
-                        </div>
-                        <div className="space-y-3">
-                           <p className="text-[9px] font-mono text-vl-muted uppercase flex items-center gap-2"><Sparkles className="w-3 h-3" /> 解決配搭</p>
-                           <p className="text-[11px] font-serif italic text-vl-text/70 leading-relaxed">{result.labAdvice}</p>
-                        </div>
-                     </div>
-                     <div className="bg-vl-surface/50 p-4 border-l-2 border-vl-gold">
-                        <p className="text-[9px] font-mono text-vl-gold uppercase mb-1">操作指南 / Instructions</p>
-                        <p className="text-[12px] font-serif italic">建議於 <span className="font-bold underline text-vl-text">{result.ritualTime}</span>，面向 <span className="font-bold underline text-vl-text">{result.ritualDirection}</span> 進行儀式操作。</p>
-                     </div>
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2 border-l-2 border-vl-gold pl-3">
+                       <h3 className="text-[11px] font-mono text-vl-gold uppercase tracking-[0.2em] font-bold">【邏輯解析 / ANALYTICAL LOGIC】</h3>
+                    </div>
+                    <div className="pl-4">
+                       <p className="text-[14px] font-serif leading-relaxed italic text-vl-text/90">
+                          <span className="text-vl-gold opacity-50 mr-2 font-mono text-[10px]">DEEP_CALIBRATION:</span>
+                          {result.incidentAnalysis}
+                       </p>
+                    </div>
                   </div>
 
-                  {/* Stamp */}
-                  <div className="flex justify-end pt-4 opacity-50 relative z-10 grayscale group-hover:grayscale-0 transition-all">
-                    <div className="w-24 h-24 border-4 border-vl-red border-double rounded-full flex flex-col items-center justify-center font-serif text-[10px] text-vl-red font-bold uppercase rotate-[-15deg] p-2 leading-tight text-center">
-                       永利實驗室<br/>首席鑑定官<br/>能量校準章
+                  <div className="space-y-5 pt-4">
+                    <div className="flex items-center gap-2 border-l-2 border-vl-muted pl-3">
+                       <h3 className="text-[11px] font-mono text-vl-muted uppercase tracking-[0.2em] font-bold">【校準協議 / RITUAL PROTOCOLS】</h3>
+                    </div>
+                    <div className="pl-4 space-y-4">
+                       <div className="space-y-2">
+                          <p className="text-[9px] font-mono text-vl-muted uppercase">資糧配方 / Recipe</p>
+                          <div className="flex flex-wrap gap-2">
+                             {result.materials.map(m => (
+                               <span key={m} className="px-2 py-1 border border-vl-border text-[10px] font-serif italic bg-vl-surface/20">{m}</span>
+                             ))}
+                          </div>
+                       </div>
+                       <div className="space-y-2">
+                          <p className="text-[9px] font-mono text-vl-muted uppercase">實驗室推薦 / Lab Choice</p>
+                          <p className="text-[11px] font-serif italic text-vl-text/70 leading-relaxed border-l-2 border-vl-border pl-3">{result.labAdvice}</p>
+                       </div>
+                       <div className="bg-vl-surface/40 p-3 border border-vl-border rounded-sm">
+                          <p className="text-[9px] font-mono text-vl-gold uppercase mb-1 flex items-center gap-2"><Compass className="w-2.5 h-2.5" /> 校準導航 / Navigation</p>
+                          <p className="text-[11px] font-serif italic">
+                             建議於 <span className="font-bold underline text-vl-text">{result.ritualTime}</span>，<span className="text-vl-text font-bold">{result.ritualDirection}</span> 進行操作。
+                          </p>
+                       </div>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end pt-6 opacity-30 grayscale hover:grayscale-0 transition-all duration-700">
+                    <div className="w-20 h-20 border-2 border-vl-red border-dotted rounded-full flex flex-col items-center justify-center font-serif text-[8px] text-vl-red font-bold uppercase rotate-[-12deg] p-1 text-center">
+                       永利實驗室<br/>能源校準<br/>專用章
                     </div>
                   </div>
                 </div>
 
-                {/* Glossary Section Dynamic */}
                 <div className="space-y-4 pt-10 border-t border-vl-border/20">
                    <div className="text-[10px] font-mono text-vl-gold uppercase flex items-center gap-2 font-bold whitespace-nowrap overflow-hidden">
                       <BookOpen className="w-3.5 h-3.5 shrink-0" /> 術語辭典 / Glossary
@@ -440,6 +447,13 @@ export default function App() {
                       <p className="text-[12px] font-serif italic text-vl-muted leading-relaxed">{result.targetTranslation}</p>
                    </div>
                 </div>
+
+                <button 
+                  onClick={() => window.print()} 
+                  className="w-full border border-vl-border py-3 text-[10px] font-mono text-vl-muted hover:text-vl-gold hover:border-vl-gold transition-all mt-8"
+                >
+                  DOWNLOAD_IDENTIFICATION_REPORT (PDF)
+                </button>
               </motion.div>
             )}
           </AnimatePresence>
