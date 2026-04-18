@@ -1,0 +1,23 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  /* Geometric Balance uses Courier New / Georgia, but we'll use enhanced versions */
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  --font-serif: "Cormorant Garamond", serif;
+  
+  --color-vl-bg: #141414;
+  --color-vl-surface: #1e1e1e;
+  --color-vl-border: #3d3428;
+  --color-vl-gold: #d4af37;
+  --color-vl-red: #b22222;
+  --color-vl-text: #e0e0e0;
+  --color-vl-muted: #9c9c9c;
+}
+
+@layer base {
+  body {
+    @apply bg-vl-bg text-vl-text antialiased font-sans;
+  }
+}
