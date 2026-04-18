@@ -1,6 +1,8 @@
 import { LunarInfo } from './lunarService';
 
 export type Direction = '東方' | '南方' | '西方' | '北方' | '中宮' | '東南' | '西南' | '東北' | '西北';
+export type Gender = 'Male' | 'Female';
+
 export type IncidentObject = 
   | '【五方路頭神】' 
   | '【十類孤魂】' 
@@ -78,7 +80,8 @@ export function analyzeChaYatGeok(
   direction: Direction,
   symptoms: Symptom[],
   userZodiac?: string,
-  scenario?: Scenario
+  scenario?: Scenario,
+  gender: Gender = 'Male'
 ): AnalysisResult {
   const directions: Record<Direction, string> = {
     '東方': '木 (震卦)', '南方': '火 (離卦)', '西方': '金 (兌卦)', '北方': '水 (坎卦)',
@@ -87,12 +90,18 @@ export function analyzeChaYatGeok(
 
   const element = directions[direction];
   const isZodiacClash = userZodiac === lunarInfo.clashZodiac;
+  const isZodiacHarm = userZodiac === lunarInfo.harmZodiac;
   const isBadDay = lunarInfo.isBadDay;
 
   // AI Diagnostic Core v2.6.5
   let targetObject: IncidentObject = '【遊魂驚擾】';
 
-  if (symptoms.includes('小兒驚啼')) {
+  // Dynamic Logic Priority (V2.6.5 Alpha)
+  if (gender === 'Female' && scenario === '夜間水邊 (北)') {
+    targetObject = '【十類孤魂】';
+  } else if (gender === 'Male' && scenario === '施工動土 (中)') {
+    targetObject = '【土煞地靈】';
+  } else if (symptoms.includes('小兒驚啼')) {
     targetObject = '【小兒關煞】';
   } else if (symptoms.includes('夢見先人') || symptoms.includes('夜夢亡人')) {
     targetObject = '【家先 / 門官】';
@@ -119,17 +128,22 @@ export function analyzeChaYatGeok(
   const translation = GLOSSARY[targetObject];
   let analysis = `【首席鑑定官審核】：觀乎今日「${lunarInfo.ganZhiDay}」，氣場於「${direction}」${element}產生顯著相位交感。`;
   
-  if (isZodiacClash) {
-    analysis += `閣下生肖(${userZodiac})與日課產生「正沖」，導致個人防禦力跌至低點。`;
+  // Gender Influence
+  analysis += gender === 'Male' ? '鑑定數據顯示此為「陽性沖撞」診斷類型。' : '鑑定數據顯示此為「陰性糾纏」診斷類型。';
+
+  if (isZodiacClash || isZodiacHarm) {
+    analysis += `閣下生肖(${userZodiac})與日課產生「${isZodiacClash ? '六沖' : '六害'}」，時運正逢低谷，氣場防禦薄弱。`;
   }
 
   // Deep Reasoning Logic
-  analysis += `在此背景下，閣下身處「${direction}」場域進行「${symptoms[0] || '日常'}」等活動，誘發了${targetObject}。`;
+  analysis += `在此背景下，閣下作為${gender === 'Male' ? '男性' : '女性'}身處「${direction}」進行「${symptoms[0] || '日常'}」等活動，誘發了${targetObject}。`;
   
   if (targetObject === '【五鬼 / 官符】') {
     analysis += `生肖${userZodiac}者在今日火金交戰之局中，極易誘發口舌或意外擦撞之負性震盪。`;
   } else if (targetObject === '【土煞地靈】') {
     analysis += `地脈能量因近期動土而處於躁動狀態，與閣下今日之運勢座標產生共振。`;
+  } else if (gender === 'Female' && targetObject === '【十類孤魂】') {
+    analysis += `女性之陰柔氣場在水邊低頻環境下，極易與游散能量產生共鳴。`;
   } else {
     analysis += `此為時空磁場與個人生物場在特定座標下的失焦碰撞。`;
   }
@@ -157,6 +171,12 @@ export function analyzeChaYatGeok(
     default:
       materials = ['通用資糧', '金銀', '長壽香'];
       labAdvice = '推薦實驗室全效艾草系列。';
+  }
+
+  // Double recommendations if clash/harm
+  if (isZodiacClash || isZodiacHarm) {
+    materials = materials.map(m => `加倍量 ${m}`);
+    labAdvice = `【限時強效】因今日生肖相沖，校準力度需加強。${labAdvice}`;
   }
 
   return {

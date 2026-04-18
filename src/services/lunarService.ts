@@ -9,6 +9,7 @@ export interface LunarInfo {
   isBadDay: boolean;
   dayType: string;
   clashZodiac: string;
+  harmZodiac: string;
 }
 
 const WU_XING_MAP: Record<string, string> = {
@@ -40,6 +41,12 @@ const ZODIAC_CLASH: Record<string, string> = {
   '申': '虎', '酉': '兔', '戌': '龍', '亥': '蛇'
 };
 
+const ZODIAC_HARM: Record<string, string> = {
+  '子': '羊', '丑': '馬', '寅': '巳', '卯': '辰',
+  '辰': '卯', '巳': '寅', '午': '丑', '未': '子',
+  '申': '亥', '酉': '戌', '戌': '酉', '亥': '申'
+};
+
 export function getLunarInfo(date: Date): LunarInfo {
   const solar = Solar.fromDate(date);
   const lunar = Lunar.fromSolar(solar);
@@ -50,6 +57,7 @@ export function getLunarInfo(date: Date): LunarInfo {
   
   const twelveDeity = lunar.getZhiXing(); // 12 gods (建除十二神)
   const clashZodiac = ZODIAC_CLASH[dayZhi] || '未知';
+  const harmZodiac = ZODIAC_HARM[dayZhi] || '未知';
   
   // Basic Sui Po (Year Breaker) logic: If day branch clashes with year branch
   const yearZhi = lunar.getYearZhi();
@@ -63,6 +71,7 @@ export function getLunarInfo(date: Date): LunarInfo {
     wuXingDay: wuXing,
     isBadDay: ['破', '執'].includes(twelveDeity) || isSuiPo,
     dayType: isSuiPo ? '日值歲破 (大凶)' : (DAY_TYPES[twelveDeity] || twelveDeity),
-    clashZodiac: clashZodiac // What zodiac the day clashes with
+    clashZodiac: clashZodiac,
+    harmZodiac: harmZodiac
   };
 }

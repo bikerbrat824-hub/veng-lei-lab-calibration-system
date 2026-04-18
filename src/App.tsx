@@ -27,7 +27,8 @@ import {
 } from 'lucide-react';
 import { cn } from './lib/utils';
 import { getLunarInfo } from './services/lunarService';
-import { analyzeChaYatGeok, Direction, IncidentObject, AnalysisResult, Scenario, SCENARIO_MAPPING, Symptom } from './services/chaYatGeokService';
+import { analyzeChaYatGeok, Direction, IncidentObject, AnalysisResult, Scenario, SCENARIO_MAPPING, Symptom, Gender } from './services/chaYatGeokService';
+import { Solar, Lunar } from 'lunar-typescript';
 
 /**
  * 永利實驗室 (Veng Lei Laboratory) - 查日腳鑑定報告系統
@@ -36,6 +37,8 @@ import { analyzeChaYatGeok, Direction, IncidentObject, AnalysisResult, Scenario,
 
 export default function App() {
   const [date, setDate] = useState<string>(new Date().toISOString().split('T')[0]);
+  const [birthDate, setBirthDate] = useState<string>('');
+  const [gender, setGender] = useState<Gender>('Male');
   const [userZodiac, setUserZodiac] = useState<string>('鼠');
   const [direction, setDirection] = useState<Direction>('中宮');
   const [selectedScenario, setSelectedScenario] = useState<Scenario | '手動'>('自家場域' as any);
@@ -80,6 +83,24 @@ export default function App() {
 
   const lunarInfo = useMemo(() => getLunarInfo(new Date(date)), [date]);
 
+  // Sync Zodiac with Birth Date
+  useEffect(() => {
+    if (birthDate) {
+      try {
+        const solar = Solar.fromDate(new Date(birthDate));
+        const lunar = Lunar.fromSolar(solar);
+        const z = lunar.getYearZhi();
+        const zodiacMap: Record<string, string> = {
+          '子': '鼠', '丑': '牛', '寅': '虎', '卯': '兔', '辰': '龍', '巳': '蛇',
+          '午': '馬', '未': '羊', '申': '猴', '酉': '雞', '戌': '狗', '亥': '豬'
+        };
+        if (zodiacMap[z]) setUserZodiac(zodiacMap[z]);
+      } catch (e) {
+        console.error("Invalid birth date");
+      }
+    }
+  }, [birthDate]);
+
   const loadingTexts = [
     "正在讀取《崇道堂通勝》數據庫...",
     "掃描時空座標與方位能量...",
@@ -115,7 +136,7 @@ export default function App() {
     setResult(null);
     setTimeout(() => {
       const scenarioParam = selectedScenario === '手動' ? undefined : selectedScenario;
-      const analysis = analyzeChaYatGeok(lunarInfo, direction, symptoms, userZodiac, scenarioParam);
+      const analysis = analyzeChaYatGeok(lunarInfo, direction, symptoms, userZodiac, scenarioParam, gender);
       setResult(analysis);
       setIsAnalyzing(false);
     }, 2400);
@@ -154,14 +175,40 @@ export default function App() {
           
           <div className="space-y-4">
             <div className="text-[10px] uppercase tracking-[0.2em] text-vl-gold flex items-center gap-2 font-mono font-bold">
-              <Calendar className="w-3.5 h-3.5" /> 時空座標 / Coordinates
+              <UserCheck className="w-3.5 h-3.5" /> 個人參數 / Personal
             </div>
-            <input 
-              type="date" 
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              className="w-full bg-vl-surface border border-vl-border p-3 rounded-sm text-sm font-mono text-vl-gold focus:outline-none focus:ring-1 focus:ring-vl-gold transition-all"
-            />
+            
+            <div className="grid grid-cols-2 gap-2">
+              <button 
+                onClick={() => setGender('Male')}
+                className={cn(
+                  "py-2 border text-[10px] font-mono uppercase transition-all",
+                  gender === 'Male' ? "bg-vl-gold text-black border-vl-gold" : "bg-vl-surface border-vl-border text-vl-muted"
+                )}
+              >
+                男性 (Yang)
+              </button>
+              <button 
+                onClick={() => setGender('Female')}
+                className={cn(
+                  "py-2 border text-[10px] font-mono uppercase transition-all",
+                  gender === 'Female' ? "bg-vl-gold text-black border-vl-gold" : "bg-vl-surface border-vl-border text-vl-muted"
+                )}
+              >
+                女性 (Yin)
+              </button>
+            </div>
+
+            <div className="space-y-2">
+              <p className="text-[8px] font-mono text-vl-muted uppercase">出生日期 (用於算生肖)</p>
+              <input 
+                type="date" 
+                value={birthDate}
+                onChange={(e) => setBirthDate(e.target.value)}
+                className="w-full bg-vl-surface border border-vl-border p-2 rounded-sm text-[11px] font-mono text-vl-gold focus:outline-none"
+              />
+            </div>
+
             <div className="grid grid-cols-6 gap-1.5 p-1 bg-vl-surface/30 border border-vl-border rounded-sm">
               {zodiacs.map(z => (
                 <button
@@ -176,6 +223,26 @@ export default function App() {
                 </button>
               ))}
             </div>
+            {(lunarInfo.clashZodiac === userZodiac || lunarInfo.harmZodiac === userZodiac) && (
+              <div className="bg-vl-red/5 border border-vl-red/20 p-2 rounded-sm flex items-center gap-2 animate-pulse">
+                <Skull className="w-3 h-3 text-vl-red" />
+                <span className="text-[9px] text-vl-red font-mono font-bold uppercase tracking-tighter">
+                  {lunarInfo.clashZodiac === userZodiac ? 'Six_Clash' : 'Six_Harm'} Detected: Risk++
+                </span>
+              </div>
+            )}
+          </div>
+
+          <div className="space-y-4">
+            <div className="text-[10px] uppercase tracking-[0.2em] text-vl-gold flex items-center gap-2 font-mono font-bold">
+              <Calendar className="w-3.5 h-3.5" /> 事發時空 / Event Node
+            </div>
+            <input 
+              type="date" 
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+              className="w-full bg-vl-surface border border-vl-border p-3 rounded-sm text-sm font-mono text-vl-gold focus:outline-none focus:ring-1 focus:ring-vl-gold transition-all"
+            />
           </div>
 
           <div className="space-y-4">
